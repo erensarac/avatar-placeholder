@@ -1,0 +1,43 @@
+{
+  "name": "avatar-placeholder",
+  "module": "index.ts",
+  "version": "0.0.0-development",
+  "type": "module",
+  "author": {
+    "name": "Erenkan SARAÇ",
+    "email": "esarac@outlook.com.tr",
+    "url": "https://github.com/erensarac"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erensarac/avatar-placeholder.git"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "scripts": {
+    "dev": "bun run --watch server.ts",
+    "build": "bun build ./server.ts --outdir ./out --target=bun",
+    "start": "bun run build && bun run ./out/server.js",
+    "format": "bun prettier . --write",
+    "prepare": "husky",
+    "semantic-release": "semantic-release"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/rate-limit": "^9.1.0",
+    "@fastify/swagger": "^8.14.0",
+    "@fastify/swagger-ui": "^3.0.0",
+    "fastify": "^4.26.2",
+    "svg2img": "^1.0.0-beta.2"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "3.2.5",
+    "semantic-release": "^23.0.8",
+    "typescript": "^5.0.0"
+  }
+}

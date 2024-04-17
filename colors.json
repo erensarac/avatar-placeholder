@@ -1,0 +1,37 @@
+[
+  {
+    "name": "orange",
+    "background": "#FFD18D",
+    "foreground": "#BD8B40"
+  },
+  {
+    "name": "yellow",
+    "background": "#DBFF8D",
+    "foreground": "#9BBF4D"
+  },
+  {
+    "name": "green",
+    "background": "#8DFFB4",
+    "foreground": "#49BA6F"
+  },
+  {
+    "name": "blue",
+    "background": "#8DB4FF",
+    "foreground": "#416ABB"
+  },
+  {
+    "name": "purple",
+    "background": "#A48DFF",
+    "foreground": "#5941BB"
+  },
+  {
+    "name": "pink",
+    "background": "#FF8DE6",
+    "foreground": "#C73FA9"
+  },
+  {
+    "name": "red",
+    "background": "#FF8DA2",
+    "foreground": "#AC3449"
+  }
+]

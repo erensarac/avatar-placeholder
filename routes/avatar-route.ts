@@ -85,6 +85,13 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
           "application/json": {
             schema: {
               type: "object",
+              properties: {
+                statusCode: {
+                  type: "number",
+                },
+                error: { type: "string" },
+                message: { type: "string" },
+              },
             },
           },
         },

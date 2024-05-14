@@ -1,11 +1,9 @@
 import svg2img from "svg2img";
 import type { FastifyRequest, FastifyReply, FastifyInstance, FastifyPluginOptions } from "fastify";
-
-interface IColor {
-  name: string;
-  background: string;
-  foreground: string;
-}
+import generateColor from "../utils/generate-color";
+import getLetters from "../utils/get-letters";
+import type { Color } from "../types/color";
+import transformCase from "../utils/transform-case";
 
 interface IQuerystring {
   color: string;
@@ -16,8 +14,6 @@ interface IQuerystring {
   lowercase: boolean;
   format: "svg" | "jpeg";
 }
-
-const colors: IColor[] = await Bun.file("colors.json").json();
 
 async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
   const avatarQuerystringJsonSchema = {
@@ -112,10 +108,6 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
           });
         }
 
-        const randomIndex: number =
-          request.query.name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;
-        const randomColor: IColor = colors.at(Math.round(randomIndex))!;
-        request.query.color = !request.query.color ? randomColor.name : request.query.color;
         done();
       },
       preParsing: (request: FastifyRequest<{ Querystring: IQuerystring }>, _reply: FastifyReply, payload, done) => {
@@ -132,25 +124,26 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       },
     },
     async (request: FastifyRequest<{ Querystring: IQuerystring }>, reply: FastifyReply) => {
-      const { size, shape, name, letterCount, lowercase } = request.query;
-      const letters = name
-        .split(" ")
-        .map((value) => value.replace('"', "").at(0))
-        .slice(0, letterCount);
-      const color: IColor = colors.find((color) => color.name === request.query.color)!;
-      const text = letters.toLocaleString().replace(",", "");
-      const circle = `<circle r="${size / 2 - 1}" cx="${size / 2}" cy="${size / 2}" fill="${color?.background}" stroke="${color?.background}" />`;
-      const square = `<rect x="0" y="0" width="${size}" height="${size}" fill="${color?.background}"/>`;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${color?.foreground}" font-size="${size / 2 - 10}" font-weight="bold" font-family="Rubik, sans-serif" text-anchor="middle" alignment-baseline="central">${lowercase ? text.toLowerCase() : text.toUpperCase()}</text></svg>`;
+      const { color, size, shape, name, letterCount, lowercase } = request.query;
+
+      const generatedColor: Color = generateColor(name, color);
+
+      const letters: string = getLetters(name, letterCount).toString().replace(",", "");
+      const textCase = lowercase ? "lowercase" : "uppercase";
+      const text: string = transformCase(letters, textCase);
+
+      const circle = `<circle r="${size / 2 - 1}" cx="${size / 2}" cy="${size / 2}" fill="${generatedColor.background}" stroke="${generatedColor.background}" />`;
+      const square = `<rect x="0" y="0" width="${size}" height="${size}" fill="${generatedColor.background}"/>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="bold" font-family="Rubik, sans-serif" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
 
       if (request.query.format === "jpeg") {
         svg2img(svg, (error, buffer) => {
-          if (!error) return reply.type("image/jpeg").send(buffer);
-          else reply.code(500).send("Internal Server Error");
+          if (!error) reply.type("image/jpeg").send(buffer);
+          reply.code(500).send("Internal Server Error");
         });
-      } else {
-        reply.header("Content-Type", "image/svg+xml").send(svg.replace(/<!--(.*?)-->|\s\B/gm, "").trim());
       }
+
+      reply.header("Content-Type", "image/svg+xml").send(svg.replace(/<!--(.*?)-->|\s\B/gm, "").trim());
     },
   );
 }

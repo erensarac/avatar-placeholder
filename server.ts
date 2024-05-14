@@ -34,6 +34,10 @@ await fastify.register(import("@fastify/swagger-ui"), {
   transformSpecificationClone: true,
 });
 
+fastify.get("/", (_, reply) => {
+  reply.redirect("/docs");
+});
+
 await fastify.register(import("./routes/avatar-route"));
 
 fastify.listen({ port: Number(process.env["PORT"]!) || 3000 }, (err, address) => {

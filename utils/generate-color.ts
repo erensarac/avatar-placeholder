@@ -1,6 +1,5 @@
+import { colors } from "../constants";
 import type { Color } from "../types/color";
-
-const colors: Color[] = await Bun.file("colors.json").json();
 
 export default function (name: string, colorName?: string): Color {
   const randomIndex: number = name.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % colors.length;

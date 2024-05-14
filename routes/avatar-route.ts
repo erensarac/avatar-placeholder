@@ -1,18 +1,21 @@
 import svg2img from "svg2img";
 import type { FastifyRequest, FastifyReply, FastifyInstance, FastifyPluginOptions } from "fastify";
+import type { Color } from "../types/color";
 import generateColor from "../utils/generate-color";
 import getLetters from "../utils/get-letters";
-import type { Color } from "../types/color";
 import transformCase from "../utils/transform-case";
+
+type IAvatarShape = "circle" | "square";
+type IAvatarFormat = "svg" | "jpeg";
 
 interface IQuerystring {
   color: string;
   name: string;
   letterCount: number;
   size: number;
-  shape: "circle" | "square";
+  shape: IAvatarShape;
   lowercase: boolean;
-  format: "svg" | "jpeg";
+  format: IAvatarFormat;
 }
 
 async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
@@ -117,7 +120,7 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
 
         request.query.size = 300;
         request.query.lowercase = request.query.lowercase || false;
-        request.query.shape = request.query.shape ? (request.query.shape.replace(/['"]+/g, "") as "circle" | "square") : "square";
+        request.query.shape = request.query.shape ? (request.query.shape.replace(/['"]+/g, "") as IAvatarShape) : "square";
         request.query.letterCount = isNaN(letterCount) ? 2 : letterCount;
 
         done(null, payload);

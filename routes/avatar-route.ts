@@ -135,9 +135,11 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       const textCase = lowercase ? "lowercase" : "uppercase";
       const text: string = transformCase(letters, textCase);
 
+      const fontFamily: "Arial" = "Arial";
+
       const circle = `<circle r="${size / 2 - 1}" cx="${size / 2}" cy="${size / 2}" fill="${generatedColor.background}" stroke="${generatedColor.background}" />`;
       const square = `<rect x="0" y="0" width="${size}" height="${size}" fill="${generatedColor.background}"/>`;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="bold" font-family="Rubik, sans-serif" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="bold" font-family="${fontFamily}" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
 
       if (request.query.format === "jpeg") {
         svg2img(svg, (error, buffer) => {

@@ -7,6 +7,7 @@ import transformCase from "../utils/transform-case";
 
 type IAvatarShape = "circle" | "square";
 type IAvatarFormat = "svg" | "jpeg";
+type IFontWeight = "bold" | "normal";
 
 interface IQuerystring {
   color: string;
@@ -16,6 +17,7 @@ interface IQuerystring {
   shape: IAvatarShape;
   lowercase: boolean;
   format: IAvatarFormat;
+  fontWeight: IFontWeight;
 }
 
 async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
@@ -39,6 +41,10 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
         type: "number",
         enum: [300],
         default: 300,
+      },
+      fontWeight: {
+        type: "string",
+        enum: ["bold", "normal"],
       },
       shape: {
         type: "string",
@@ -136,10 +142,11 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       const text: string = transformCase(letters, textCase);
 
       const fontFamily: "Arial" = "Arial";
+      const fontWeight: IFontWeight = request.query.fontWeight || "bold";
 
       const circle = `<circle r="${size / 2 - 1}" cx="${size / 2}" cy="${size / 2}" fill="${generatedColor.background}" stroke="${generatedColor.background}" />`;
       const square = `<rect x="0" y="0" width="${size}" height="${size}" fill="${generatedColor.background}"/>`;
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="bold" font-family="${fontFamily}" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="${fontWeight}" font-family="${fontFamily}" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
 
       if (request.query.format === "jpeg") {
         svg2img(svg, (error, buffer) => {

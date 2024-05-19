@@ -1,4 +1,4 @@
-import svg2img from "svg2img";
+import { Resvg } from "@resvg/resvg-js";
 import type { FastifyRequest, FastifyReply, FastifyInstance, FastifyPluginOptions } from "fastify";
 import type { Color } from "../types/color";
 import generateColor from "../utils/generate-color";
@@ -149,10 +149,16 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape === "circle" ? circle : square}<text x="${size / 2}" y="${size / 2}" fill="${generatedColor.foreground}" font-size="${size / 2 - 10}" font-weight="${fontWeight}" font-family="${fontFamily}" text-anchor="middle" alignment-baseline="central">${text}</text></svg>`;
 
       if (request.query.format === "jpeg") {
-        svg2img(svg, (error, buffer) => {
-          if (!error) reply.type("image/jpeg").send(buffer);
-          reply.code(500).send("Internal Server Error");
+        const resvg = new Resvg(svg, {
+          font: {
+            loadSystemFonts: true,
+          },
         });
+        const data = resvg.render();
+        const buffer = data.asPng();
+
+        if (!buffer) reply.code(500).send("Internal Server Error");
+        reply.type("image/jpeg").send(buffer);
       }
 
       reply.header("Content-Type", "image/svg+xml").send(svg.replace(/<!--(.*?)-->|\s\B/gm, "").trim());

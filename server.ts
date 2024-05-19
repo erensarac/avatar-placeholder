@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import type { FastifyInstance } from "fastify";
+import path from "path";
 
 const fastify: FastifyInstance = Fastify({
   logger: false,
@@ -32,6 +33,11 @@ await fastify.register(import("@fastify/swagger-ui"), {
     return swaggerObject;
   },
   transformSpecificationClone: true,
+});
+
+fastify.register(require("@fastify/static"), {
+  root: path.join(import.meta.dirname, "public"),
+  prefix: "/public/",
 });
 
 fastify.get("/", (_, reply) => {

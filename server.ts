@@ -44,7 +44,7 @@ fastify.get("/", (_, reply) => {
   reply.redirect("/docs");
 });
 
-await fastify.register(import("./routes/avatar-route"));
+await fastify.register(import("@/routes/avatar-route"));
 
 fastify.listen({ port: Number(process.env["PORT"]!) || 3000 }, (err, address) => {
   if (err) {

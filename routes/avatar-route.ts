@@ -1,9 +1,9 @@
 import { Resvg } from "@resvg/resvg-js";
 import type { FastifyRequest, FastifyReply, FastifyInstance, FastifyPluginOptions } from "fastify";
-import type { Color } from "../types/color";
-import generateColor from "../utils/generate-color";
-import getLetters from "../utils/get-letters";
-import transformCase from "../utils/transform-case";
+import type { Color } from "@/types/color";
+import generateColor from "@/utils/generate-color";
+import getLetters from "@/utils/get-letters";
+import transformCase from "@/utils/transform-case";
 
 type IAvatarShape = "circle" | "square";
 type IAvatarFormat = "svg" | "jpeg";

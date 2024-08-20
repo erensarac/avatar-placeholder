@@ -1,5 +1,6 @@
+import type { FastifyPluginAsync } from "fastify";
 import { Resvg } from "@resvg/resvg-js";
-import type { FastifyRequest, FastifyReply, FastifyInstance, FastifyPluginOptions } from "fastify";
+import type { FastifyRequest, FastifyReply } from "fastify";
 import type { Color } from "@/types/color";
 import generateColor from "@/utils/generate-color";
 import getLetters from "@/utils/get-letters";
@@ -22,8 +23,8 @@ interface IQuerystring {
   fontWeight: IFontWeight;
 }
 
-async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) {
-  const avatarQuerystringJsonSchema = {
+const avatar: FastifyPluginAsync = async (fastify): Promise<void> => {
+  const queryStringJsonSchema = {
     type: "object",
     required: ["name"],
     properties: {
@@ -37,7 +38,7 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       },
       letterCount: {
         type: "number",
-        enum: [1, 2],
+        enum: [1, 2, 3],
       },
       size: {
         type: "number",
@@ -71,7 +72,7 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
 
   const schema = {
     tags: ["avatar"],
-    querystring: avatarQuerystringJsonSchema,
+    querystring: queryStringJsonSchema,
     produces: ["image/*"],
     examples: false,
     response: {
@@ -113,7 +114,7 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
   };
 
   fastify.get(
-    "/avatar",
+    "/",
     {
       schema,
       preValidation: (request, reply, done) => {
@@ -128,14 +129,9 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
         done();
       },
       preParsing: (request: FastifyRequest<{ Querystring: IQuerystring }>, _reply: FastifyReply, payload, done) => {
-        const letterCount: number = request.query.letterCount
-          ? Number(request.query.letterCount.toString().replace(/["]+/g, ""))
-          : 2;
-
         request.query.size = 300;
         request.query.lowercase = request.query.lowercase || false;
         request.query.shape = request.query.shape ? (request.query.shape.replace(/['"]+/g, "") as IAvatarShape) : "square";
-        request.query.letterCount = isNaN(letterCount) ? 2 : letterCount;
 
         done(null, payload);
       },
@@ -145,7 +141,7 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
 
       const generatedColor: Color = generateColor(name, color);
 
-      const letters: string = getLetters(name, letterCount).toString().replace(",", "");
+      const letters: string = getLetters(name, letterCount);
       const textCase = lowercase ? "lowercase" : "uppercase";
       const text: string = transformCase(letters, textCase);
 
@@ -161,21 +157,21 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
         const resvg = new Resvg(svg, {
           font: {
             fontFiles: [
-              "./public/fonts/Inter/static/Inter-Black.ttf",
-              "./public/fonts/Inter/static/Inter-Bold.ttf",
-              "./public/fonts/Inter/static/Inter-ExtraBold.ttf",
-              "./public/fonts/Inter/static/Inter-ExtraLight.ttf",
-              "./public/fonts/Inter/static/Inter-Light.ttf",
-              "./public/fonts/Inter/static/Inter-Medium.ttf",
-              "./public/fonts/Inter/static/Inter-Regular.ttf",
-              "./public/fonts/Inter/static/Inter-SemiBold.ttf",
-              "./public/fonts/Inter/static/Inter-Thin.ttf",
-              "./public/fonts/Rubik/static/Rubik-Black.ttf",
-              "./public/fonts/Rubik/static/Rubik-Bold.ttf",
-              "./public/fonts/Rubik/static/Rubik-ExtraBold.ttf",
-              "./public/fonts/Rubik/static/Rubik-Light.ttf",
-              "./public/fonts/Rubik/static/Rubik-Medium.ttf",
-              "./public/fonts/Rubik/static/Rubik-SemiBold.ttf",
+              "./src/public/fonts/Inter/static/Inter-Black.ttf",
+              "./src/public/fonts/Inter/static/Inter-Bold.ttf",
+              "./src/public/fonts/Inter/static/Inter-ExtraBold.ttf",
+              "./src/public/fonts/Inter/static/Inter-ExtraLight.ttf",
+              "./src/public/fonts/Inter/static/Inter-Light.ttf",
+              "./src/public/fonts/Inter/static/Inter-Medium.ttf",
+              "./src/public/fonts/Inter/static/Inter-Regular.ttf",
+              "./src/public/fonts/Inter/static/Inter-SemiBold.ttf",
+              "./src/public/fonts/Inter/static/Inter-Thin.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-Black.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-Bold.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-ExtraBold.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-Light.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-Medium.ttf",
+              "./src/public/fonts/Rubik/static/Rubik-SemiBold.ttf",
             ],
             loadSystemFonts: false,
             defaultFontFamily: "Rubik",
@@ -191,6 +187,6 @@ async function routes(fastify: FastifyInstance, _options: FastifyPluginOptions) 
       reply.header("Content-Type", "image/svg+xml").send(svg.replace(/<!--(.*?)-->|\s\B/gm, "").trim());
     },
   );
-}
+};
 
-export default routes;
+export default avatar;

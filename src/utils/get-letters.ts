@@ -1,10 +1,10 @@
-export default function (name: string, count: number = 2) {
-  if (!name) {
-    throw new Error("");
-  }
+export default function getLetters(name: string, count: number): string {
+  const words: string[] = name.split(" ");
+  const letterCount: number = count ? Math.min(count, 3) : 2;
 
-  return name
-    .split(" ")
-    .map((value) => value.replace('"', "").at(0))
-    .slice(0, count);
+  return words
+    .map((word) => word.replace('"', "").at(0))
+    .slice(0, letterCount)
+    .toString()
+    .replaceAll(",", "");
 }

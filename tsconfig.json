@@ -1,12 +1,17 @@
 {
+  "extends": "fastify-tsconfig",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./src/*"]
     },
+    "outDir": "dist",
+    "sourceMap": false,
+    "esModuleInterop": true,
     "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",
+    "jsx": "react-jsx",
     "allowJs": true,
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
@@ -18,5 +23,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true
-  }
+  },
+  "include": ["src/**/*.ts"]
 }
